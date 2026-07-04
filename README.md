@@ -146,10 +146,19 @@ but about different things.
 
 #### Interactive demo
 
+Run locally (the trained model ships in the repo):
+
 ```bash
-python scripts/build_demo_model.py    # trains models/tfidf_logreg.joblib
+pip install -r requirements.txt
 streamlit run app/streamlit_app.py
 ```
+
+Or retrain from your own corpus copy: `python scripts/build_demo_model.py`.
+
+**Hosted:** deployable as-is on Streamlit Community Cloud — repo root, main file
+`app/streamlit_app.py`, Python 3.12 (`requirements.txt` pins `scikit-learn==1.9.0`
+to match the committed model artifact; the pin matters, joblib files don't survive
+sklearn version drift).
 
 Paste any line of dialogue and get both **WHO** (predicted speaker + probability across all 12
 voices) and **WHY** (the specific n-grams — TF-IDF weight × learned coefficient — that pushed
