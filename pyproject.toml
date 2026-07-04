@@ -18,7 +18,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-embeddings = ["sentence-transformers>=2.6"]  # CPU-friendly; used from Week 3 on
+# torch pinned <2.12: on this Windows/anaconda-3.12 setup, PyPI's default
+# torch==2.12.1 wheel fails to load (WinError 1114 on torch/lib/c10.dll,
+# reproducible 100% of the time). torch==2.6.0+cpu from the PyTorch CPU index
+# is verified working. If a fresh venv still pulls a broken wheel, install
+# explicitly: pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
+embeddings = ["torch<2.12", "sentence-transformers>=2.6"]
 app = ["streamlit>=1.35"]
 dev = ["pytest>=8.0", "ruff>=0.4", "jupyter", "tabulate>=0.9"]
 

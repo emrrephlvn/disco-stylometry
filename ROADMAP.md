@@ -74,6 +74,13 @@ gate recorded above; ✅ shortlist locked in `src/discostyle/config.py`.
 
 **Exit criteria:** fingerprint table + radar; separation shown numerically for ≥3 speakers.
 
+> **Windows setup notes (found running this repo):** (1) the PyPI default
+> `torch==2.12.1` wheel fails to load on this Windows/anaconda-3.12 box
+> (`WinError 1114`, `c10.dll`) — pinned `torch<2.12` in `pyproject.toml`,
+> verified working at `2.6.0+cpu`. (2) Some Windows consoles (cp1254 etc.)
+> can't print `→`/`—`; scripts use plain ASCII (`->`) in `print()` output —
+> written files stay UTF-8 and unaffected either way.
+
 ## Week 3 — The classifier
 
 **Goal:** an honest, reportable accuracy number.

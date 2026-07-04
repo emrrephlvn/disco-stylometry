@@ -23,12 +23,43 @@ from sklearn.model_selection import GroupShuffleSplit
 from sklearn.pipeline import FeatureUnion, Pipeline
 
 
+def scene_of(df: pd.DataFrame) -> pd.Series:
+    """Scene id (one .gv conversation) for each line — the grouping unit for both
+    the cap and the split, so they compose without leaking."""
+    return df["line_id"].str.rsplit(":", n=1).str[0]
+
+
 def scene_split(df: pd.DataFrame, test_size: float = 0.2, seed: int = 42):
     """Train/test indices grouped by scene so no conversation straddles the split."""
-    groups = df["line_id"].str.rsplit(":", n=1).str[0]
     gss = GroupShuffleSplit(n_splits=1, test_size=test_size, random_state=seed)
-    train_idx, test_idx = next(gss.split(df, df["speaker"], groups))
+    train_idx, test_idx = next(gss.split(df, groups=scene_of(df)))
     return df.index[train_idx], df.index[test_idx]
+
+
+def scene_aware_cap(
+    df: pd.DataFrame, max_lines: int, label: str = "speaker_canon", seed: int = 42
+) -> pd.DataFrame:
+    """Cap over-represented classes by dropping WHOLE scenes, never random lines.
+
+    Random line-capping fragments scenes and fights the scene-grouped split; here
+    each class's scenes are shuffled and kept until the line budget is reached
+    (the last scene may overshoot slightly — intentional, to keep it intact).
+    """
+    scenes = scene_of(df)
+    rng = np.random.default_rng(seed)
+    keep: list = []
+    for _, grp in df.groupby(label):
+        by_scene = grp.groupby(scenes.loc[grp.index])
+        sids = list(by_scene.groups)
+        rng.shuffle(sids)
+        count = 0
+        for sid in sids:
+            idx = list(by_scene.groups[sid])
+            keep.extend(idx)
+            count += len(idx)
+            if count >= max_lines:
+                break
+    return df.loc[keep].sort_index()
 
 
 def tfidf_baseline() -> Pipeline:
