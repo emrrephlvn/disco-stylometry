@@ -103,6 +103,27 @@ def embed(
     return vecs
 
 
+def explain_prediction(pipe: Pipeline, text: str, label: str, top_k: int = 8) -> pd.DataFrame:
+    """WHY, not just WHO: the n-grams (word or char) that pushed ``text`` toward
+    ``label`` in the fitted TF-IDF pipeline — contribution = tfidf_value * coef.
+
+    Interpretability mandate for the Week-4 demo: a probability bar tells you the
+    verdict; this tells you the evidence. Only nonzero (present-in-text) n-grams
+    are considered, so it explains THIS line, not the class in general.
+    """
+    features = pipe.named_steps["features"]
+    clf = pipe.named_steps["clf"]
+    x = features.transform([text])  # 1 x n_features, sparse
+    names = features.get_feature_names_out()
+    class_idx = list(clf.classes_).index(label)
+    coef = clf.coef_[class_idx]
+
+    contrib = x.multiply(coef).toarray().ravel()
+    nz = contrib.nonzero()[0]
+    top = nz[np.argsort(-contrib[nz])[:top_k]]
+    return pd.DataFrame({"ngram": names[top], "contribution": contrib[top]})
+
+
 def evaluate(y_true, y_pred, labels: list[str]) -> dict:
     """Everything the README's metrics table needs."""
     return {

@@ -70,7 +70,10 @@ def main() -> None:
         + "\n\n*Feature dictionary:* n_words=mean words/line, type_token_ratio=lexical "
           "diversity, hapax_rate=once-only words, exclaim/question/ellipsis_rate=punctuation "
           "per word, caps_word_rate=ALL-CAPS words, flesch_reading_ease=readability "
-          "(higher=simpler).\n",
+          "(higher=simpler).\n\n*Note:* values here are rounded to 3dp for display. Some "
+          "pairwise distances (e.g. the closest-pair ranking) are margin-sensitive at that "
+          "precision — recompute from `featurize()` output directly for anything that "
+          "compares distances, don't parse this file back in.\n",
         encoding="utf-8",
     )
     fig = radar(fp, SHORTLIST_V1)

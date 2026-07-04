@@ -85,25 +85,35 @@ gate recorded above; ✅ shortlist locked in `src/discostyle/config.py`.
 
 **Goal:** an honest, reportable accuracy number.
 
-- [ ] Baseline: TF-IDF (word + char n-grams) → LogisticRegression. Stratified split **by dialogue scene, not by line** (adjacent lines leak context). Apply the scene-aware cap (see Week-2 design contract).
-- [ ] Upgrade: sentence-transformers embeddings (CPU-friendly, e.g. `all-MiniLM-L6-v2`) → LogReg/SVM. Compare.
-- [ ] **Tier-2 ablation:** also run the full 38-class model. Cheap, and it *earns* the "why 12"
-  story — show the macro-F1 / per-class drop-off that justifies the locked shortlist. Keep the
-  number for the README and the interview.
-- [ ] Evaluation: per-class precision/recall, confusion matrix, macro-F1 vs. majority-class + random baselines.
-- [ ] Error analysis: the confusions *are* the story ("the model mistakes Klaasje for the Narrator when she's performing").
+- [x] Baseline: TF-IDF (word + char n-grams) → LogisticRegression. Scene-grouped split +
+  scene-aware cap. Macro-F1 0.446 / acc 0.570 (Tier-1, 12 classes).
+- [x] Upgrade: MiniLM embeddings → LogReg. Macro-F1 0.388 / acc 0.490 — **loses to TF-IDF**,
+  including on short lines (falsified the "embeddings help short text" hypothesis; see README).
+- [x] **Tier-2 ablation:** 38→36 valid classes, macro-F1 0.446→0.196 — earns "why 12".
+- [x] Evaluation: majority + random baselines, confusion matrix, Kim~Klaasje dedicated report
+  (closest fingerprint pair, only 5–8% cross-confusion — content beats aggregate style).
+- [x] Error analysis: 5 observations read off min-support-filtered confusion rates.
 
-**Exit criteria:** metrics table with baselines; confusion matrix; 5 written error-analysis observations.
+**Exit criteria:** ✅ `reports/week3_metrics.md` — metrics table, confusion matrix, hardest-pair
+report, length-stratified TF-IDF-vs-embedding comparison, 5 error-analysis observations.
 
 ## Week 4 — Fingerprint atlas + interactive demo
 
 **Goal:** the portfolio-facing artifact.
 
-- [ ] UMAP of line embeddings colored by speaker ("voice constellation" — lean into the DE noir palette).
-- [ ] Streamlit app: paste any sentence → predicted speaker + probability bars + which stylometric features drove it.
-- [ ] "Voice fingerprint" page per character (radar + signature words via log-odds).
+- [x] UMAP "voice constellation" (MiniLM embeddings, all 10,874 locked-12 lines) — cross-checked
+  against Week 2 (fingerprint) and Week 3 (confusion) closest pairs rather than eyeballed. The
+  three methods disagree (different notions of "similar"); Cuno is the one voice that
+  triangulates as an outlier in semantic space specifically (1.9× the next-most-isolated voice).
+- [x] Streamlit demo: paste a sentence → **WHO** (probability bars) + **WHY** (n-gram
+  contribution = TF-IDF weight × LogReg coefficient) — the interpretability mandate made
+  concrete, not just a verdict.
+- [ ] "Voice fingerprint" page per character (radar + signature words via log-odds) — Week 2's
+  radar already exists (`reports/radar.html`); a dedicated per-character demo page deferred,
+  not required for the exit criteria below.
 
-**Exit criteria:** demo runs locally end-to-end; screenshots in README.
+**Exit criteria:** ✅ demo verified end-to-end with Playwright (WHO/WHY panels render, zero
+console errors) — screenshot in README.
 
 ## Week 5 — V2 or polish (decided by Spike B)
 
