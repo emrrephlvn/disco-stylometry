@@ -49,7 +49,8 @@ pytest
 
 ## Results
 
-*(Filled in as weeks complete — every claim here must trace to a metric or plot.)*
+Every claim below traces to a committed metric or figure in [`reports/`](reports/); each week
+has a runnable script in [`scripts/`](scripts/) that regenerates it.
 
 ### Week 2 — voice fingerprints (interpretability test: PASS)
 
@@ -194,10 +195,36 @@ Full write-up: [`reports/week5_skill_metrics.md`](reports/week5_skill_metrics.md
 - **[Disco Narrator](https://152334h.github.io/blog/dn-1/)** (152334h) — TTS / voice synthesis
   on DE dialogue. Also generation-side, not analysis.
 - **Stylometry / authorship attribution** (Mosteller & Wallace; Burrows' Delta) — the classic
-  toolkit this leans on; a Delta/MFW baseline is a documented next step (ROADMAP Week 5).
+  toolkit this leans on; the Delta/MFW baseline is implemented and reported above
+  ([`reports/delta_baseline.md`](reports/delta_baseline.md)).
 
 Positioning: prior DE-NLP work is generation-side; this is the attribution/interpretability
 angle — "who/which voice, and *why*, measured."
+
+## Limitations
+
+Reported plainly, because a portfolio piece that hides its edges is less trustworthy than one
+that names them:
+
+- **These are honest baselines, not maxed numbers.** No hyperparameter search, one embedding
+  model (MiniLM), default LogReg. The point is a clean, leak-free comparison — TF-IDF 0.446
+  macro-F1 (V1) is what the *method* gets, not what a tuned system could.
+- **Scene-grouped splitting has a cost.** It's the right call (adjacent lines leak topic), but
+  characters whose lines cluster in a few conversations end up with thin test support — some
+  per-class F1 rests on a handful of test lines. Error analysis filters classes with <15–20 test
+  lines for exactly this reason; treat rare-class numbers as indicative, not precise.
+- **Short lines are hard and partly excluded.** Bark-heavy voices (Cunoesse, and "You" itself)
+  were dropped in Week 1 because per-line stylometry on 3–5 word interjections is noise. So the
+  models are evaluated on the *tractable* slice, not every line in the game.
+- **V2 is a harder, imbalanced problem, and the numbers say so.** 23 skills (Perception dropped
+  at 20 lines), macro-F1 0.322 — well below V1's characters. Skills overlap semantically by
+  design; this is not a solved task, it's an honest first pass.
+- **"Who sounds like whom" has no single ground truth.** Four methods give four closest-pairs.
+  That's a genuine finding, but it also means any single similarity claim is method-relative.
+- **English only.** Stylometry is language-bound; the Russian DE corpus exists but isn't usable
+  here. Findings don't transfer across localizations.
+- **Interpretations are labeled as such.** The sociolinguistic readings of confusions are
+  literary framing on top of the data, not measured claims — and marked that way in the text.
 
 ## Honesty & legal
 

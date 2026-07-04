@@ -146,9 +146,15 @@ voice, rewrite it *in that voice*. Never load-bearing.
 
 ## Week 6 — Buffer + shipping
 
-- [ ] Deploy demo (Streamlit Community Cloud or HF Spaces).
-- [ ] README as a portfolio case study: problem → data → method → **numbers** → error analysis → limitations.
-- [ ] Limitations section is mandatory and honest: corpus is copyrighted (not redistributed), Narrator class may absorb skill lines (if V2 failed), scene-level split rationale.
+- [x] README as a portfolio case study: what it is → weekly results with **numbers** →
+  falsified hypothesis → cross-check → V2 → related work → limitations.
+- [x] **Limitations section** (mandatory, honest): baselines-not-tuned, scene-split thin-support
+  cost, short-line exclusion, V2 imbalance, no-single-ground-truth, English-only, interpretations
+  labeled. Corpus copyright covered under Honesty & legal.
+- [ ] **Deploy demo (needs the user's go-ahead — outward-facing/publishing).** Streamlit
+  Community Cloud or HF Spaces. Blocker to resolve first: the demo needs `models/tfidf_logreg.joblib`
+  (gitignored) + the corpus to rebuild it; a deploy must either commit the trained model or
+  rebuild from a corpus the host can fetch. Decide model-artifact strategy before publishing.
 
 ---
 
