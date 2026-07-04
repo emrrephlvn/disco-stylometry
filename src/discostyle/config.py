@@ -30,6 +30,12 @@ SHORTLIST_V1 = [
 
 # Per-class line cap to tame imbalance (Kim alone has 5262 lines; the rest
 # 395–947). Capping at 900 brings the ceiling from 34.2x down to ~2.3x.
+#
+# SCENE-AWARE: apply by selecting whole scenes (one .gv = one scene) until the
+# budget is reached, NOT by random line sampling. Random capping fragments
+# scenes and collides with the scene-grouped split (a scene's lines must not
+# straddle train/test). Cap = drop whole scenes; split = assign whole scenes.
+# Fingerprint means (Week 2) ignore the cap and use all lines per speaker.
 MAX_LINES_PER_CLASS = 900
 
 # Tier 2 — documented stretch: the full 38 speakers with >=150 lines AND

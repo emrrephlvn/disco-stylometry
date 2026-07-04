@@ -46,11 +46,32 @@ pytest
 
 *(Filled in as weeks complete — every claim here must trace to a metric or plot.)*
 
+### Week 2 — voice fingerprints (interpretability test: PASS)
+
+On the locked 12 speakers, each voice has a **distinct, explainable** stylometric fingerprint
+(all 12 pairwise-distinct; most-confusable pair Kim ~ Klaasje, both measured/articulate). The
+single most-distinctive feature per voice reads like the game:
+
+| Voice | Signature (z-score) | Reads as |
+|---|---|---|
+| Cuno | `exclaim_rate` **+2.4** | the shouting kid |
+| The Deserter | `ellipsis_rate` **+2.5** | dying communist, trailing off; longest lines (39 words) |
+| Jean Vicquemare | `question_rate` **+2.0** | the interrogating cop |
+| Joyce Messier | `flesch_reading_ease` **−1.4** | most complex, eloquent capitalist |
+| Cuno | `flesch` **89.6** (simplest) | vs Joyce 73.9 |
+| Noid | `hapax_rate` **+1.9** | idiosyncratic vocabulary |
+
+Full table: [`reports/fingerprints.md`](reports/fingerprints.md) · radar: `reports/radar.html`
+(regenerate with `python scripts/week2_fingerprints.py`).
+
+### Week 3 — classifier (pending)
+
 | Model | Macro-F1 | Accuracy | vs. majority baseline |
 |---|---|---|---|
 | Majority class | — | *TBD* | — |
 | TF-IDF + LogReg | *TBD* | *TBD* | *TBD* |
 | MiniLM embeddings + LogReg | *TBD* | *TBD* | *TBD* |
+| Tier-2 ablation (38 classes) | *TBD* | *TBD* | *TBD* |
 
 ## Honesty & legal
 

@@ -20,7 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 embeddings = ["sentence-transformers>=2.6"]  # CPU-friendly; used from Week 3 on
 app = ["streamlit>=1.35"]
-dev = ["pytest>=8.0", "ruff>=0.4", "jupyter"]
+dev = ["pytest>=8.0", "ruff>=0.4", "jupyter", "tabulate>=0.9"]
 
 [build-system]
 requires = ["setuptools>=68"]

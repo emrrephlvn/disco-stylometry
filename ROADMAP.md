@@ -58,17 +58,31 @@ gate recorded above; ✅ shortlist locked in `src/discostyle/config.py`.
 **Goal:** every line (and every speaker aggregate) has a measurable fingerprint.
 
 - [ ] Implement `features/stylometry.py`: type-token ratio, hapax rate, avg sentence/word length, readability (textstat), function-word frequencies, punctuation profile, char n-gram profile.
-- [ ] Per-speaker fingerprint table + first radar/violin plots.
-- [ ] Sanity check: do the fingerprints *already* separate speakers visually? (If Kim and Cuno look identical here, revisit preprocessing before touching models.)
+- [ ] **First output: per-speaker fingerprint table + radar** on the locked 12. Reading this
+  *is* the interpretability mandate's first test — whether each voice has a distinct
+  fingerprint — not a throwaway "sanity check". If Kim and Cuno look identical here, fix
+  preprocessing before any model. (Quantify it too: pairwise fingerprint distance + each
+  speaker's most-distinctive z-scored feature, so "they separate" is a number, not a vibe.)
 
-**Exit criteria:** fingerprint table + 2–3 plots that visibly separate at least 3 speakers.
+> **Design contract — scene-aware cap (spans Week 2/3).** `MAX_LINES_PER_CLASS` must be applied
+> by selecting whole *scenes* until the budget is hit, never by random line sampling. Random
+> line-capping fragments scenes and muddies the unit of analysis, so it fights the
+> scene-grouped split in Week 3 (same scene's lines must never straddle train/test). Cap =
+> drop whole scenes; split = assign whole scenes. They compose only if both act on scenes.
+> (Fingerprint means in Week 2 use *all* lines per speaker — the cap is a training-balance
+> tool, irrelevant to aggregate stylometry.)
+
+**Exit criteria:** fingerprint table + radar; separation shown numerically for ≥3 speakers.
 
 ## Week 3 — The classifier
 
 **Goal:** an honest, reportable accuracy number.
 
-- [ ] Baseline: TF-IDF (word + char n-grams) → LogisticRegression. Stratified split **by dialogue scene, not by line** (adjacent lines leak context).
+- [ ] Baseline: TF-IDF (word + char n-grams) → LogisticRegression. Stratified split **by dialogue scene, not by line** (adjacent lines leak context). Apply the scene-aware cap (see Week-2 design contract).
 - [ ] Upgrade: sentence-transformers embeddings (CPU-friendly, e.g. `all-MiniLM-L6-v2`) → LogReg/SVM. Compare.
+- [ ] **Tier-2 ablation:** also run the full 38-class model. Cheap, and it *earns* the "why 12"
+  story — show the macro-F1 / per-class drop-off that justifies the locked shortlist. Keep the
+  number for the README and the interview.
 - [ ] Evaluation: per-class precision/recall, confusion matrix, macro-F1 vs. majority-class + random baselines.
 - [ ] Error analysis: the confusions *are* the story ("the model mistakes Klaasje for the Narrator when she's performing").
 
