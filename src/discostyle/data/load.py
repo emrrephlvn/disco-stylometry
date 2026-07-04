@@ -20,6 +20,20 @@ PROCESSED = Path("data/processed/lines.parquet")
 
 # GraphViz node label format used by mos9527/disco-corpus:  Speaker: "line text"
 _GV_LABEL = re.compile(r'label\s*=\s*"(?P<speaker>[^:"]+):\s*\\"(?P<text>.*?)\\""', re.DOTALL)
+_WS = re.compile(r"\s+")
+
+
+def _clean_text(raw: str) -> str:
+    """Unescape GraphViz label escapes and normalize whitespace.
+
+    - ``\\"`` -> ``"`` (inner quotes)
+    - ``\\n`` / ``\\l`` / ``\\r`` (label line-break/justify escapes) -> space,
+      so they don't leak into stylometry as a stray ``n``/``l`` token.
+    """
+    txt = raw.replace('\\"', '"')
+    for esc in ("\\n", "\\l", "\\r"):
+        txt = txt.replace(esc, " ")
+    return _WS.sub(" ", txt).strip()
 
 
 def load_gv_corpus(gv_dir: Path, source: str = "mos9527") -> pd.DataFrame:
@@ -30,15 +44,15 @@ def load_gv_corpus(gv_dir: Path, source: str = "mos9527") -> pd.DataFrame:
     labels varies).
     """
     rows: list[dict] = []
-    for gv in sorted(gv_dir.glob("*.gv")):
+    # rglob, not glob: the real corpus nests .gv files under letter dirs (A/, B/…).
+    for gv in sorted(gv_dir.rglob("*.gv")):
         content = gv.read_text(encoding="utf-8", errors="replace")
         for i, m in enumerate(_GV_LABEL.finditer(content)):
             rows.append(
                 {
                     "line_id": f"{gv.stem}:{i}",
                     "speaker": m["speaker"].strip(),
-                    # GraphViz labels escape inner quotes as \" — unescape them.
-                    "text": m["text"].replace('\\"', '"').strip(),
+                    "text": _clean_text(m["text"]),
                     "source": source,
                 }
             )

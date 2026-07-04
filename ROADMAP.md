@@ -16,12 +16,28 @@
   2. jd7h gist (extracted texts) — backup.
   3. Kaggle `lizakonopelko/disco-elysium-dialogue-texts` — dataset *name not independently
      verified*; use only if it actually exists, else drop.
-- [ ] EDA notebook: lines per speaker, length distributions, class imbalance. Decide the speaker shortlist (start with 4–6 well-represented characters: e.g. Kim, Cuno, Klaasje, Joyce, Narrator, Garte).
+- [x] **V1 sufficiency gate — PASS (2026-07-04).** Full corpus parsed → 36,189 lines,
+  156 speakers, `data/processed/lines.parquet` written (33,430 lines after `clean()`).
+  Report: `scripts/eda_v1_gate.py`; locked config: `src/discostyle/config.py`.
+  - **Gate 1 (counts):** 38 characters have ≥150 lines.
+  - **Gate 2 (bark risk = ≥10-word ratio):** named characters 0.74–0.96 (stylometry-safe).
+    Bark-heavy excluded: `You` (0.45) and `Cunoesse` (0.48, median 9 words) — *identity, not
+    hygiene*: per-line stylometry on barks is noise.
+  - **Gate 3 (imbalance):** 34.2× across all 38 (Kim 5262 dominates) → **cap classes at 900
+    lines** (`MAX_LINES_PER_CLASS`), bringing the locked-12 ceiling to ~2.3×.
+  - **Gate 4 ('You' + aliases):** `You` excluded (41%, heterogeneous narration). Comma-split
+    canonicalization; first-token scan found **no true same-character duplicates** to merge
+    ("The Deserter"/"The Gardener" are distinct characters, not aliases); object/book
+    "speakers" fall below 150 lines on their own.
+  - **LOCKED shortlist (Tier 1, 12):** Kim, Cuno, Joyce, Klaasje, Titus Hardie, Evrart,
+    The Deserter, Jean Vicquemare, Garte, Lena, Noid, Soona. Tier 2 (full 38) documented.
 - [x] **Spike A (kill-switch) — PASS (2026-07-04).** `mos9527/disco-corpus` exists (branch
-  `main`), English `.gv` under `graphviz/disco-corpus-en/` (1456 files). Label format
-  `id [label="Speaker: \"text\""]` confirmed; `load_gv_corpus` parses it (validated on a
-  40-file sample → 1927 lines, clean character labels: You/Kim/Soona/Garte/Joyce/Gary/Cuno…).
-  Fix applied: unescape `\"` in text.
+  `main`), English `.gv` under `graphviz/disco-corpus-en/`. Label format
+  `id [label="Speaker: \"text\""]` confirmed; `load_gv_corpus` **validated on the full
+  1456-file corpus** (483 files carry dialogue, 973 are stub/door/object convos). Edge-case
+  audit: only **6/1456 files** (objects/thoughts) hit a format variant the regex misses —
+  V1-irrelevant, logged. Encoding verified clean UTF-8 (0 replacement chars; `é` etc. intact).
+  Fixes applied: `rglob` (nested letter dirs), unescape `\"`, normalize `\n`/`\l`/`\r`.
 - [x] **Spike B (V2 gate) — NO-GO for the mos9527 corpus (2026-07-04).** Skill voices are
   *technically* present as speakers but *practically absent*: in a 40-file sample, only **5
   skill-labeled lines** (0.6% of "You"), across 4 skills, 1–2 lines each → extrapolated
@@ -34,8 +50,8 @@
     source-data property, not an extraction gap. **Treat V2 as unlikely, not merely deferred.**
   - **Consequence:** V1 (character-level) is the project. Week 5 = polish + optional LLM layer.
 
-**Exit criteria:** ~~`lines.parquet` exists~~ (needs a full corpus pull, user step); ✅ both
-spike verdicts recorded above.
+**Exit criteria:** ✅ `data/processed/lines.parquet` written; ✅ both spike verdicts + V1
+gate recorded above; ✅ shortlist locked in `src/discostyle/config.py`.
 
 ## Week 2 — Stylometric features + first pictures
 
