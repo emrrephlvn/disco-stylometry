@@ -17,12 +17,25 @@
   3. Kaggle `lizakonopelko/disco-elysium-dialogue-texts` — dataset *name not independently
      verified*; use only if it actually exists, else drop.
 - [ ] EDA notebook: lines per speaker, length distributions, class imbalance. Decide the speaker shortlist (start with 4–6 well-represented characters: e.g. Kim, Cuno, Klaasje, Joyce, Narrator, Garte).
-- [ ] **Spike A (kill-switch, ≤2 h):** confirm character labels are clean and consistent across the chosen source. If labels are dirty → switch source, not project.
-- [ ] **Spike B (V2 gate, ≤3 h, timeboxed):** inspect the raw 266 MB asset JSON (or Disco Narrator's formatting notes) — is skill attribution (`LOGIC`, `INLAND EMPIRE`, …) recoverable as a speaker-like field?
-  - **PASS** → V2 unlocked, plan it for Week 5.
-  - **FAIL** → V1 continues unchanged; Week 5 becomes polish + optional LLM layer.
+- [x] **Spike A (kill-switch) — PASS (2026-07-04).** `mos9527/disco-corpus` exists (branch
+  `main`), English `.gv` under `graphviz/disco-corpus-en/` (1456 files). Label format
+  `id [label="Speaker: \"text\""]` confirmed; `load_gv_corpus` parses it (validated on a
+  40-file sample → 1927 lines, clean character labels: You/Kim/Soona/Garte/Joyce/Gary/Cuno…).
+  Fix applied: unescape `\"` in text.
+- [x] **Spike B (V2 gate) — NO-GO for the mos9527 corpus (2026-07-04).** Skill voices are
+  *technically* present as speakers but *practically absent*: in a 40-file sample, only **5
+  skill-labeled lines** (0.6% of "You"), across 4 skills, 1–2 lines each → extrapolated
+  **~45 lines/skill for ~4 skills** over the full corpus. Harry's introspection collapses to
+  the `You` actor (~31k lines est.). ~45 lines/skill cannot train a 24-class classifier.
+  - Earlier web-research pessimism (single narrator) was the *audio* layer; the *text* check
+    independently confirms NO-GO for a different reason (introspection → `You`).
+  - Residual V2 hope = the raw 266 MB game asset only (needs the user's game files). Given the
+    well-regarded mos9527 extraction already collapsed skills to `You`, this is likely a
+    source-data property, not an extraction gap. **Treat V2 as unlikely, not merely deferred.**
+  - **Consequence:** V1 (character-level) is the project. Week 5 = polish + optional LLM layer.
 
-**Exit criteria:** `data/processed/lines.parquet` exists; Spike B verdict written into this file.
+**Exit criteria:** ~~`lines.parquet` exists~~ (needs a full corpus pull, user step); ✅ both
+spike verdicts recorded above.
 
 ## Week 2 — Stylometric features + first pictures
 
