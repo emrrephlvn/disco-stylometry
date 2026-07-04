@@ -230,6 +230,11 @@ that names them:
 
 - **The corpus is copyrighted (ZA/UM).** This repo ships code and acquisition
   instructions, never the game text itself (no `.gv`, no `disco.db`, no parquet).
+- **One deliberate exception:** the trained demo model (`models/tfidf_logreg.joblib`, 4.9 MB)
+  *is* committed so the hosted demo can run without rebuilding from the corpus. It contains
+  TF-IDF statistics and LogReg coefficients — the vocabulary includes word 1–2-grams and
+  character n-grams (dictionary-level fragments), but **no dialogue lines** and no way to
+  reconstruct them. Comparable to publishing a concordance, not the text.
 - Two corpora, two roles: **mos9527/disco-corpus** (character-labeled, V1) and
   **msyavuz/disco-api `disco.db`** (skill-labeled, V2). The Week-1 skill-attribution NO-GO
   was specific to the first source; the second exposes skills as separate actors.

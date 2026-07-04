@@ -1,0 +1,9 @@
+# Streamlit Community Cloud deploy manifest — demo only (no torch/embeddings:
+# the shipped model is TF-IDF + LogReg).
+# scikit-learn is PINNED: the committed .joblib was trained under 1.9.0 and
+# joblib artifacts are not guaranteed compatible across sklearn versions.
+streamlit>=1.58
+scikit-learn==1.9.0
+pandas>=2.0
+numpy>=1.26
+joblib>=1.5

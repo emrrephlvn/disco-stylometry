@@ -7,15 +7,25 @@ Needs: data/processed/lines.parquet + a trained pipeline at
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import joblib
 import pandas as pd
 import streamlit as st
 
-from discostyle.models.classifier import explain_prediction
+# Streamlit Cloud runs from the repo root without pip-installing the package;
+# put src/ on the path so `discostyle` resolves there too (no-op locally when
+# the package is already installed).
+_SRC = Path(__file__).resolve().parent.parent / "src"
+if _SRC.is_dir() and str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
-MODEL_PATH = Path("models/tfidf_logreg.joblib")
+from discostyle.models.classifier import explain_prediction  # noqa: E402
+
+# Resolve against the repo root (parent of app/), not the process cwd, so the
+# model is found no matter where streamlit is launched from.
+MODEL_PATH = Path(__file__).resolve().parent.parent / "models" / "tfidf_logreg.joblib"
 
 st.set_page_config(page_title="Who Said It? — Disco Elysium Stylometry", page_icon="🎙️")
 st.title("WHO SAID IT?")

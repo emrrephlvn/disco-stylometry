@@ -18,9 +18,12 @@ dist/
 .ruff_cache/
 .pytest_cache/
 
-# Models & artifacts
+# Models & artifacts — the shipped demo model IS committed (4.9 MB; TF-IDF
+# vocabulary + LogReg coefficients, no full dialogue lines) so Streamlit Cloud
+# can serve it without rebuilding from the (non-redistributable) corpus.
 models/*.joblib
 models/*.pkl
+!models/tfidf_logreg.joblib
 
 # Reports: keep the .md/.csv summaries, ignore regenerable interactive HTML
 reports/*.html
