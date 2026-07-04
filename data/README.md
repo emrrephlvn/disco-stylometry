@@ -11,7 +11,11 @@ data/
     lines.parquet   # columns: line_id, speaker, text, source
 ```
 
-Sources to try, in order:
+**V1 — character corpus** (`load_gv_corpus`, → `lines.parquet`):
 1. **mos9527/disco-corpus** (primary) — GraphViz `.gv`, `Speaker: "line"` node labels
 2. jd7h gist (backup): https://gist.github.com/jd7h/e724eb2b23faa42b51424ac110c7b976
 3. Kaggle `lizakonopelko/disco-elysium-dialogue-texts` — name unverified; use only if it exists
+
+**V2 — skill corpus** (`scripts/build_v2_corpus.py`, → `lines_v2.parquet`):
+- **msyavuz/disco-api** `disco.db` (SQLite, ~40 MB): the 24 skills are separate actors.
+  `curl -sL https://raw.githubusercontent.com/msyavuz/disco-api/main/disco.db -o data/raw/disco.db`

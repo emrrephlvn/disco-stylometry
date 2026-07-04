@@ -3,8 +3,8 @@
 > *Stylometric fingerprints and speaker attribution on the dialogue of Disco Elysium —
 > can a model tell Kim Kitsuragi from Cuno from the Narrator by style alone?*
 
-**Status:** Weeks 1–3 done (data, fingerprints, classifier). Week 4 (atlas + demo) in
-progress. See [ROADMAP.md](ROADMAP.md) for the week-by-week plan.
+**Status:** Weeks 1–5 done — data + fingerprints + character classifier (V1) + atlas + demo,
+and V2 (24 skill voices) revived from a second corpus. See [ROADMAP.md](ROADMAP.md).
 
 ## What this is
 
@@ -18,9 +18,11 @@ This project treats that as a measurable claim:
 3. **Atlas** — an interactive demo: paste a sentence, get a speaker verdict with
    probabilities and the stylistic evidence behind it.
 
-**Stretch goal (V2):** recover the 24 *skill* voices (Logic, Inland Empire, …) from the raw
-game asset and re-run everything as "which inner voice is speaking?" — gated by a Week-1
-spike, never assumed. Rationale documented in [ROADMAP.md](ROADMAP.md).
+**V2 (revived — see Week 5):** the 24 *skill* voices (Logic, Inland Empire, …) as classes.
+The Week-1 spike said NO-GO on the first corpus (mos9527 folds skills into "You"), but a
+second source ([`disco.db`](https://github.com/msyavuz/disco-api)) stores each skill as a
+separate actor — so V2 is real after all, as a 23-class classifier. The reversal is itself the
+lesson: *the NO-GO was the data source's, not the task's.*
 
 ## Layout
 
@@ -140,11 +142,55 @@ probability bar names a verdict, the evidence table justifies it.
 
 ![Demo screenshot](reports/demo_screenshot.png)
 
+### Week 5 — V2: which of the 24 inner voices is speaking?
+
+The Week-1 spike declared skill-level attribution NO-GO — but that was the *first corpus*
+(mos9527) collapsing every skill into the player actor. A second source,
+[msyavuz/disco-api](https://github.com/msyavuz/disco-api)'s `disco.db`, stores the 24 skills as
+**separate actors** (verified: Volition=397, Electrochemistry=405, …). 23 of 24 skills have
+≥100 clean lines, so V2 is a real 23-class classifier — same pipeline as V1.
+
+| Model | 23 skills, macro-F1 / acc |
+|---|---|
+| random / majority | 0.038 / 0.005 |
+| TF-IDF + LogReg | 0.298 / 0.304 |
+| **MiniLM embeddings + LogReg** | **0.322 / 0.330** |
+
+**+0.293 over majority across 23 classes**, and harder than V1's 12 characters — as expected,
+since six skills are "intellect", six "physique", etc. Two honest findings:
+
+1. **Representation flips.** For *characters* TF-IDF won; for *skills* **embeddings win**.
+   Characters are separated by surface idiolect (slang, register) that n-grams catch; skills by
+   *what they talk about* (semantic content) that MiniLM catches. Best representation is
+   task-dependent, not universal.
+2. **Attribute structure is faint, not clean.** 29% of misclassifications stay within the true
+   skill's attribute group (INT/PSY/FYS/MOT) vs ~23% by chance — a 1.27× lean, and the largest
+   individual confusions are actually cross-attribute. The four-attribute grouping leaves a
+   fingerprint in the errors, but the model does not cleanly recover it. (Reported as the modest
+   effect it is, not inflated.)
+
+Full write-up: [`reports/week5_skill_metrics.md`](reports/week5_skill_metrics.md).
+
+## Related work
+
+- **[xxond/disco-limbic-dialogue](https://github.com/xxond/disco-limbic-dialogue)** — LLM
+  *generation* of inner-voice (Empathy, Inland Empire, Electrochemistry) dialogue. Orthogonal:
+  this project does *attribution / stylometry*, not generation.
+- **[Disco Narrator](https://152334h.github.io/blog/dn-1/)** (152334h) — TTS / voice synthesis
+  on DE dialogue. Also generation-side, not analysis.
+- **Stylometry / authorship attribution** (Mosteller & Wallace; Burrows' Delta) — the classic
+  toolkit this leans on; a Delta/MFW baseline is a documented next step (ROADMAP Week 5).
+
+Positioning: prior DE-NLP work is generation-side; this is the attribution/interpretability
+angle — "who/which voice, and *why*, measured."
+
 ## Honesty & legal
 
 - **The corpus is copyrighted (ZA/UM).** This repo ships code and acquisition
-  instructions, never the game text itself.
-- Known limitation going in: in easily available extractions, skill voices are folded
-  into Narrator-like actors; character-level attribution is the verified-feasible core,
-  skill-level is a spike-gated stretch.
+  instructions, never the game text itself (no `.gv`, no `disco.db`, no parquet).
+- Two corpora, two roles: **mos9527/disco-corpus** (character-labeled, V1) and
+  **msyavuz/disco-api `disco.db`** (skill-labeled, V2). The Week-1 skill-attribution NO-GO
+  was specific to the first source; the second exposes skills as separate actors.
+- **Class imbalance and small classes are reported, not hidden** — Perception (20 lines) is
+  dropped from V2; V2 macro-F1 is genuinely lower than V1 and said so plainly.
 - Non-affiliation: fan analysis project; not affiliated with ZA/UM.

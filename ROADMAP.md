@@ -115,10 +115,30 @@ report, length-stratified TF-IDF-vs-embedding comparison, 5 error-analysis obser
 **Exit criteria:** ✅ demo verified end-to-end with Playwright (WHO/WHY panels render, zero
 console errors) — screenshot in README.
 
-## Week 5 — V2 or polish (decided by Spike B)
+## Week 5 — V2 REVIVED (Spike B re-run on a new source: GO)
 
-**If Spike B PASSED:** re-run the whole pipeline with 24 skill voices as classes; the headline becomes "which inner voice is speaking?". Expect heavier class imbalance — document it honestly.
-**If Spike B FAILED:** optional LLM layer (small budget): given a user's sentence + predicted speaker, rewrite it *in that character's voice*. Strictly a garnish on top of measured results.
+Spike B's Week-1 NO-GO was **mos9527's** limitation, not the data's. A second
+source — [msyavuz/disco-api](https://github.com/msyavuz/disco-api)'s `disco.db`
+(SQLite, 40 MB) — stores the 24 skills as **separate actors** (Volition=397,
+Electrochemistry=405, …, independently verified against the `actors` table).
+
+- [x] **V2 spike — GO (2026-07-04).** 23/24 skills have ≥100 clean lines
+  (Perception is the lone exception at 20); 13,123 skill-labeled lines total,
+  median 526/skill. Text is clean (0% markup/vars/tags). `scripts/build_v2_corpus.py`
+  → `data/processed/lines_v2.parquet` (scene = `conversationid`).
+- [x] **24-voice classifier** (`scripts/week5_skill_classify.py`, 23 classes,
+  same scene-aware cap + scene-grouped split as V1): TF-IDF macro-F1 0.298,
+  **MiniLM embeddings 0.322 (embeddings win — the opposite of V1)**, +0.293 over
+  majority. Harder than V1 (skills overlap semantically), reported honestly.
+  Full write-up: `reports/week5_skill_metrics.md`.
+- V1 is **kept**, not replaced: 3 weeks of character-level numbers stand, and
+  V1 vs V2 is itself a portfolio story ("the best representation is task-dependent:
+  surface idiolect for characters → TF-IDF; semantic content for skills → embeddings").
+- [ ] *Deferred enrichments:* Burrows' Delta / MFW stylometry baseline (classic-lit
+  grounding); sociolinguistic framing of V1 confusions in the error analysis.
+
+**Optional LLM layer (unchanged, still garnish):** given a sentence + predicted
+voice, rewrite it *in that voice*. Never load-bearing.
 
 ## Week 6 — Buffer + shipping
 
