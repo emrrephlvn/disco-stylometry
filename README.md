@@ -1,7 +1,12 @@
 # WHO SAID IT? — Disco Elysium Stylometry
 
+[![Live demo](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://disco-stylometry-qmkhmppyfhjpuyxv3wpmeb.streamlit.app/)
+
 > *Stylometric fingerprints and speaker attribution on the dialogue of Disco Elysium —
 > can a model tell Kim Kitsuragi from Cuno from the Narrator by style alone?*
+
+**[▶ Try the live demo](https://disco-stylometry-qmkhmppyfhjpuyxv3wpmeb.streamlit.app/)** — paste
+a line, get WHO (speaker probabilities) + WHY (the n-gram evidence).
 
 **Status:** Weeks 1–5 done — data + fingerprints + character classifier (V1) + atlas + demo,
 and V2 (24 skill voices) revived from a second corpus. See [ROADMAP.md](ROADMAP.md).
