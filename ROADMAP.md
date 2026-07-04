@@ -134,8 +134,12 @@ Electrochemistry=405, …, independently verified against the `actors` table).
 - V1 is **kept**, not replaced: 3 weeks of character-level numbers stand, and
   V1 vs V2 is itself a portfolio story ("the best representation is task-dependent:
   surface idiolect for characters → TF-IDF; semantic content for skills → embeddings").
-- [ ] *Deferred enrichments:* Burrows' Delta / MFW stylometry baseline (classic-lit
-  grounding); sociolinguistic framing of V1 confusions in the error analysis.
+- [x] **Burrows' Delta baseline** (`features/delta.py`, `scripts/delta_baseline.py`): the
+  classic function-word method on the V1 split reaches macro-F1 0.18–0.23 (100–300 MFW) — a
+  real signal (~18× majority) but below TF-IDF/MiniLM; the interpretable floor. Its
+  closest-pair (Joyce~Soona) becomes a 4th voice in the cross-check. Tested (`test_delta.py`).
+- [x] **Sociolinguistic framing** of the Lena/Klaasje→Joyce confusion (elite performative
+  register) added to the README error analysis, marked as interpretation, not a data claim.
 
 **Optional LLM layer (unchanged, still garnish):** given a sentence + predicted
 voice, rewrite it *in that voice*. Never load-bearing.

@@ -29,7 +29,7 @@ lesson: *the NO-GO was the data source's, not the task's.*
 ```
 src/discostyle/
   data/       load.py (corpus loaders), skill_spike.py (V2 gate)
-  features/   stylometry.py (interpretable fingerprints)
+  features/   stylometry.py (fingerprints), delta.py (Burrows' Delta baseline)
   models/     classifier.py (scene-split, TF-IDF & embedding rungs)
   viz/        fingerprint.py (radar + UMAP constellation)
 app/          streamlit_app.py (interactive demo)
@@ -90,6 +90,19 @@ hardest — only 5–8% cross-confusion. Lexical content pulls them apart where 
 couldn't. The real confusions are same-archetype pairs: Lena/Klaasje → Joyce (Martinaise's
 eloquent women collapse together), Jean → Titus Hardie (clipped working-class register).
 
+*A sociolinguistic reading of that main confusion (interpretive, not a data claim):* Joyce,
+Klaasje and Lena share an **elite, performative register** — the poised, hedging, self-aware
+speech of characters who manage how they're perceived (a union negotiator, a fugitive
+maintaining a cover, a grieving widow holding composure). The classifier confuses them because
+that managed register *is* their shared surface, even though their situations differ. Jean and
+Titus confuse for the mirror reason: a blunt, guarded working-class register.
+
+**Classic-stylometry baseline (Burrows' Delta).** For literature grounding, the standard
+function-word method (Burrows 2002; Mosteller & Wallace) on the same split reaches macro-F1
+**0.18–0.23** (100–300 MFW) — a real signal (~18× majority) but well below the modern rungs.
+It's the *interpretable floor*: every dimension is a common word, the distance a plain average.
+See [`reports/delta_baseline.md`](reports/delta_baseline.md).
+
 #### Lesson learned: a falsified hypothesis
 
 Going in, the expectation was "sentence embeddings should help most on short, context-poor
@@ -112,21 +125,23 @@ original expectation.
 All 10,874 locked-12 lines, MiniLM embeddings → UMAP(2D). Full write-up:
 [`reports/week4_atlas.md`](reports/week4_atlas.md) · interactive: `reports/constellation.html`.
 
-The atlas cross-checks three independent notions of "similar" against each other rather than
+The atlas cross-checks **four independent** notions of "similar" against each other rather than
 asserting a story from the picture alone:
 
 | Method | Feature space | Closest / most notable |
 |---|---|---|
 | Week 2 fingerprint | aggregate surface stats (punctuation, readability) | Kim ~ Klaasje |
 | Week 3 classifier | lexical n-grams | Lena → Joyce (hardest confusion) |
+| Burrows' Delta | classic MFW z-scores | Joyce ~ Soona |
 | Week 4 UMAP | MiniLM sentence semantics | Klaasje ~ The Deserter (closest); **Cuno the clear outlier** (1.9× more isolated than the next voice) |
 
-**The three methods disagree** — and that's the finding, not a failure: each captures a
-different notion of vocal similarity (aggregate style vs. lexical choice vs. sentence
-semantics), so "who sounds like whom" is method-dependent, not a single ground truth. The one
-result that *does* triangulate cleanly: Cuno's semantic isolation is consistent with a child
-character whose register (slang, hostility, non-adult concerns) reads as unlike every adult
-voice in the corpus — not merely stylistically distinct, but about different things.
+**The four methods give four different answers** — and that's the finding, not a failure: each
+captures a different notion of vocal similarity (aggregate style vs. lexical choice vs. classic
+function-word profile vs. sentence semantics), so "who sounds like whom" is method-dependent,
+not a single ground truth. The one result that *does* triangulate cleanly: Cuno's semantic
+isolation is consistent with a child character whose register (slang, hostility, non-adult
+concerns) reads as unlike every adult voice in the corpus — not merely stylistically distinct,
+but about different things.
 
 #### Interactive demo
 
