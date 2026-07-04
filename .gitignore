@@ -1,6 +1,8 @@
-# Game text is copyrighted — never commit the corpus.
-data/
-!data/README.md
+# Game text is copyrighted — never commit the corpus. Ignore the *contents* of
+# the root data/ dir (not the dir itself) so the negation below can re-include
+# README, and so this never touches the src/discostyle/data/ package.
+/data/*
+!/data/README.md
 
 # Python
 __pycache__/
