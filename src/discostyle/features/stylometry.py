@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import re
 import string
+from collections import Counter
 
 import pandas as pd
 import textstat
@@ -28,8 +29,8 @@ def line_features(text: str) -> dict[str, float]:
     """Stylometric feature vector for a single line."""
     words = [w.lower() for w in _WORD.findall(text)]
     n = len(words) or 1
-    unique = set(words)
-    counts = {w: words.count(w) for w in unique}
+    counts = Counter(words)  # single pass; the old per-word .count() was O(n^2)
+    unique = counts.keys()
 
     feats: dict[str, float] = {
         "n_words": float(len(words)),

@@ -119,8 +119,10 @@ def explain_prediction(pipe: Pipeline, text: str, label: str, top_k: int = 8) ->
     coef = clf.coef_[class_idx]
 
     contrib = x.multiply(coef).toarray().ravel()
-    nz = contrib.nonzero()[0]
-    top = nz[np.argsort(-contrib[nz])[:top_k]]
+    # positive contributions only: if nothing in the text pushes TOWARD the label,
+    # return empty rather than presenting least-negative n-grams as "evidence".
+    pos = np.where(contrib > 0)[0]
+    top = pos[np.argsort(-contrib[pos])[:top_k]]
     return pd.DataFrame({"ngram": names[top], "contribution": contrib[top]})
 
 

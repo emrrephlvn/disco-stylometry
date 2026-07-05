@@ -88,7 +88,7 @@ Scene-grouped split (a scene's lines never straddle train/test) + scene-aware cl
 | **TF-IDF + LogReg** | **0.446 / 0.570** | 0.196 / 0.330 |
 | MiniLM embeddings + LogReg | 0.388 / 0.490 | 0.156 / 0.234 |
 
-**+0.432 macro-F1 over majority** — not a "kolay problem": going from 12 to 36 classes drops
+**+0.432 macro-F1 over majority** — and not an easy problem: going from 12 to 36 classes drops
 TF-IDF macro-F1 from 0.446 to 0.196, which is what actually justifies the locked 12.
 
 The fingerprint's *closest* pair, Kim ~ Klaasje (d=1.46, Week 2), is **not** the classifier's
@@ -129,7 +129,8 @@ original expectation.
 ### Week 4 — voice constellation + interactive demo
 
 All 10,874 locked-12 lines, MiniLM embeddings → UMAP(2D). Full write-up:
-[`reports/week4_atlas.md`](reports/week4_atlas.md) · interactive: `reports/constellation.html`.
+[`reports/week4_atlas.md`](reports/week4_atlas.md); the interactive `constellation.html` is not
+committed (regenerable HTML is gitignored) — rebuild it with `python scripts/week4_atlas.py`.
 
 The atlas cross-checks **four independent** notions of "similar" against each other rather than
 asserting a story from the picture alone:
@@ -151,24 +152,38 @@ but about different things.
 
 #### Interactive demo
 
-Run locally (the trained model ships in the repo):
+Run locally (both trained models ship in the repo):
 
 ```bash
 pip install -r requirements.txt
 streamlit run app/streamlit_app.py
 ```
 
-Or retrain from your own corpus copy: `python scripts/build_demo_model.py`.
+Or retrain from your own corpus copy: `python scripts/build_demo_model.py` (V1) /
+`python scripts/build_skill_demo_model.py` (V2).
 
 **Hosted:** deployable as-is on Streamlit Community Cloud — repo root, main file
 `app/streamlit_app.py`, Python 3.12 (`requirements.txt` pins `scikit-learn==1.9.0`
-to match the committed model artifact; the pin matters, joblib files don't survive
+to match the committed model artifacts; the pin matters, joblib files don't survive
 sklearn version drift).
 
-Paste any line of dialogue and get both **WHO** (predicted speaker + probability across all 12
+A toggle switches between **V1 (12 characters)** and **V2 (23 skills)**. Both ship TF-IDF —
+V2's stronger MiniLM rung (0.322 vs 0.298 macro-F1, Week 5) needs torch, which the hosted demo
+deliberately skips to stay light; the tradeoff is stated in the app, not hidden.
+
+Paste any line of dialogue and get both **WHO** (predicted speaker + probability across all
 voices) and **WHY** (the specific n-grams — TF-IDF weight × learned coefficient — that pushed
 the model toward that speaker). The WHY panel is the interpretability mandate made concrete: a
 probability bar names a verdict, the evidence table justifies it.
+
+**Closed-set honesty.** The classifier can only ever answer with one of its known voices — it
+has no "none of the above." Tested live: an out-of-corpus line about "grandpa" (from an
+independent Kaggle dump, not the training corpus) confidently returned Cuno, driven almost
+entirely by the single word "yeah" (0.24 of the evidence weight) — a real signal (Cuno uses
+"yeah" in 14.8% of his lines vs 0% for Joyce/Lena) but no guarantee the true speaker is even
+among the 12. The app now surfaces this: predictions below 25% peak probability show a "weak
+evidence" warning, 25–40% a "thin evidence" note — flagging low-confidence guesses instead of
+presenting every verdict with the same authority.
 
 ![Demo screenshot](reports/demo_screenshot.png)
 
@@ -182,7 +197,8 @@ The Week-1 spike declared skill-level attribution NO-GO — but that was the *fi
 
 | Model | 23 skills, macro-F1 / acc |
 |---|---|
-| random / majority | 0.038 / 0.005 |
+| random (stratified) | 0.038 / 0.043 |
+| majority class | 0.005 / 0.058 |
 | TF-IDF + LogReg | 0.298 / 0.304 |
 | **MiniLM embeddings + LogReg** | **0.322 / 0.330** |
 
@@ -223,6 +239,12 @@ that names them:
 - **These are honest baselines, not maxed numbers.** No hyperparameter search, one embedding
   model (MiniLM), default LogReg. The point is a clean, leak-free comparison — TF-IDF 0.446
   macro-F1 (V1) is what the *method* gets, not what a tuned system could.
+- **The classifier is closed-set and cannot say "none of these."** Given a line from a
+  character outside the locked 12 (or 23 skills), it still confidently returns its best-known
+  guess — verified live with an out-of-corpus "grandpa" line that the model attributed to Cuno
+  on real but narrow evidence (a single word, "yeah"). The app's confidence banding (weak/thin
+  evidence warnings below 25%/40% peak probability) mitigates this but doesn't solve it — a
+  low-confidence *wrong* guess can still clear the threshold.
 - **Scene-grouped splitting has a cost.** It's the right call (adjacent lines leak topic), but
   characters whose lines cluster in a few conversations end up with thin test support — some
   per-class F1 rests on a handful of test lines. Error analysis filters classes with <15–20 test

@@ -151,10 +151,16 @@ voice, rewrite it *in that voice*. Never load-bearing.
 - [x] **Limitations section** (mandatory, honest): baselines-not-tuned, scene-split thin-support
   cost, short-line exclusion, V2 imbalance, no-single-ground-truth, English-only, interpretations
   labeled. Corpus copyright covered under Honesty & legal.
-- [ ] **Deploy demo (needs the user's go-ahead — outward-facing/publishing).** Streamlit
-  Community Cloud or HF Spaces. Blocker to resolve first: the demo needs `models/tfidf_logreg.joblib`
-  (gitignored) + the corpus to rebuild it; a deploy must either commit the trained model or
-  rebuild from a corpus the host can fetch. Decide model-artifact strategy before publishing.
+- [x] **Deployed.** Live on Streamlit Community Cloud, public access verified via anonymous
+  headless-browser E2E. Model-artifact strategy: both `tfidf_logreg.joblib` (V1) and
+  `tfidf_logreg_skills.joblib` (V2) are committed (whitelisted in `.gitignore`) so the host
+  never needs the corpus; `requirements.txt` pins `scikit-learn==1.9.0` to match.
+- [x] **Post-deploy hardening**, found by hands-on live testing: `st.cache_resource` (was
+  reloading a multi-MB model on every keystroke-triggered rerun); positive-only n-gram
+  evidence in `explain_prediction` (was returning least-negative n-grams as false "evidence"
+  when nothing pushed toward the label); closed-set confidence banding (weak/thin evidence
+  warnings — see README "Closed-set honesty"); a V2 (23-skill) mode alongside V1; a
+  scene-cap+split leak-invariant test suite (`tests/test_classifier.py`).
 
 ---
 
